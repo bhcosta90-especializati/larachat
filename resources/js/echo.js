@@ -1,6 +1,6 @@
 window.Echo.join('larachat_database_chatroom')
 .here(users => {
-    console.log('Usuários Online:')
+    console.log('Usuarios Online:')
     console.log(users)
 })
 .joining(user => {

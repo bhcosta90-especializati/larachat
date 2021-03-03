@@ -2449,7 +2449,7 @@ __webpack_require__(/*! ./echo */ "./resources/js/echo.js");
 /***/ (() => {
 
 window.Echo.join('larachat_database_chatroom').here(function (users) {
-  console.log('Usu�rios Online:');
+  console.log('Usuarios Online:');
   console.log(users);
 }).joining(function (user) {
   console.log('Entrou:');

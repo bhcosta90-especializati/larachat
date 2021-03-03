@@ -13,3 +13,4 @@ npm-debug.log
 yarn-error.log
 *.log
 laravel-echo-server.lock
+git_*
