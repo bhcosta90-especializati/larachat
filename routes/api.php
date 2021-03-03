@@ -11,5 +11,5 @@ Route::get('/', function(){
 
 Route::group(['prefix' => 'v1', 'as' => 'api.v1.', 'middleware' => ['auth']], function(){
     Route::get('/users', [UserApiController::class, 'index'])->name('users.index');
-    Route::post('/messages', [ChatApiController::class, 'store'])->name('chat.store');
+    Route::get('/messages', [ChatApiController::class, 'store'])->name('chat.store');
 });
