@@ -49,3 +49,5 @@ window.Echo = new Echo({
     broadcaster: 'socket.io',
     host: window.location.hostname + ':' + process.env.MIX_SOCKET_PORT,
 });
+
+require('./echo')

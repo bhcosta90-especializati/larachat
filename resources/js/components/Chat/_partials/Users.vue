@@ -43,11 +43,12 @@
           <div class="flex items-center relative">
             <div class="relative">
               <img
-                src="https://images.unsplash.com/photo-1549078642-b2ba4bda0cdb?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=3&amp;w=144&amp;h=144"
-                alt=""
+                :src="user.photo ? user.photo : '/images/no-photo.png'"
+                :alt="user.name"
                 class="w-12 h-12 rounded-full"
               />
               <span
+                v-if="user.online"
                 class="text-green-500 absolute -bottom-0.5 -right-0.5 rounded-full bg-white border-white border-4"
               >
                 <svg width="10" height="10">
@@ -60,7 +61,7 @@
                 <span class="text-gray-700 mr-3">{{ user.name }}</span>
               </div>
               <span class="text-sm text-truncate text-muted-alt">
-                {{ user.label }}
+                {{ user.name }}
               </span>
             </div>
             <time class="absolute top-0 right-0 text-xs font-medium text-muted"
@@ -78,24 +79,25 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
+
 export default {
+  mounted() {
+    this.getUser();
+  },
+  computed: {
+    ...mapState({
+      users: (state) => state.users.items.data
+    })
+  },
   data() {
     return {
       selected: "inbox",
       activeChat: 0,
-      users: [
-        {
-          id: 1,
-          name: "Carlos",
-          label: "Novas Mensagens",
-        },
-        {
-          id: 2,
-          name: "Outro User",
-          label: "Novas Mensagens",
-        },
-      ],
     };
   },
+  methods: {
+    ...mapActions(['getUser'])
+  }
 };
 </script>
