@@ -1,4 +1,4 @@
-window.Echo.join('larachat_database_chatroom')
+window.Echo.join('laravel_database_chatroom')
 .here(users => {
     console.log('Usuarios Online:')
     console.log(users)
