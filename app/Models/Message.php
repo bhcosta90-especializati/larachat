@@ -14,13 +14,18 @@ class Message extends Model
         'message'
     ];
 
+    protected $casts = [
+        'sender_id' => 'integer',
+        'receiver_id' => 'integer',
+    ];
+
     public function sender()
     {
-        return $this->belongsTo(Message::class, 'sender_id');
+        return $this->belongsTo(User::class, 'sender_id');
     }
 
     public function receiver()
     {
-        return $this->belongsTo(Message::class, 'receiver_id');
+        return $this->belongsTo(User::class, 'receiver_id');
     }
 }
