@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [ChatController::class, 'index'])->name('chat.index');
+Route::get('/', [ChatController::class, 'index'])->name('chat.index')->middleware(['auth']);
 
 Auth::routes();
 
