@@ -1,5 +1,5 @@
 # For more information: https://laravel.com/docs/sail
-version: '3'
+version: "3"
 services:
     laravel.test:
         build:
@@ -62,6 +62,29 @@ services:
             - '${FORWARD_MAILHOG_DASHBOARD_PORT:-8025}:8025'
         networks:
             - sail
+    echo:
+        image: oanhnn/laravel-echo-server:latest
+        depends_on:
+            - laravel.test
+            - redis
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+            LARAVEL_ECHO_SERVER_AUTH_HOST: 'http://laravel.test'
+            LARAVEL_ECHO_SERVER_DEBUG: 'true'
+            LARAVEL_ECHO_SERVER_DB: redis
+            REDIS_HOST: '${REDIS_HOST}'
+            REDIS_PORT: '${REDIS_PORT}'
+        networks:
+            - sail
+        ports:
+            - '${MIX_SOCKET_PORT:-6001}:6001'
+        restart: unless-stopped
+        healthcheck:
+            test: /usr/local/bin/health-check
+            interval: 1s
+            timeout: 3s
+            retries: 10
     selenium:
        image: 'selenium/standalone-chrome'
        volumes:
