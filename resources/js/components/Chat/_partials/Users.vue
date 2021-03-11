@@ -9,6 +9,7 @@
           type="search"
           name="serch"
           placeholder="Search"
+          v-model="filter"
           class="w-full bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-none focus:shadow-lg focus:bg-white hover:shadow-md"
         />
         <button type="submit" class="absolute right-0 top-0 mt-3 mr-4">
@@ -48,8 +49,8 @@
                 class="w-12 h-12 rounded-full"
               />
               <span
-                v-if="user.online"
-                class="text-green-500 absolute -bottom-0.5 -right-0.5 rounded-full bg-white border-white border-4"
+                class="absolute -bottom-0.5 -right-0.5 rounded-full bg-white border-white border-4"
+                :class="[user.online ? 'text-green-500' : 'text-gray-500']"
               >
                 <svg width="10" height="10">
                   <circle cx="5" cy="5" r="5" fill="currentColor"></circle>
@@ -79,21 +80,28 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 
 export default {
   mounted() {
     this.getUser();
   },
   computed: {
-    ...mapState({
-      users: (state) => state.users.items.data
-    })
+    ...mapGetters({
+      allUsers: 'sortedUsers',
+    }),
+    users () {
+        return this.allUsers.filter(user => {
+            if (this.filter === '') return user;
+            return user.name.includes(this.filter) || user.email === this.filter
+        })
+    }
   },
   data() {
     return {
       selected: "inbox",
       activeChat: 0,
+      filter: ''
     };
   },
   methods: {

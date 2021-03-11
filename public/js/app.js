@@ -2362,20 +2362,29 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
     this.getUser();
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapState)({
-    users: function users(state) {
-      return state.users.items.data;
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)({
+    allUsers: 'sortedUsers'
+  })), {}, {
+    users: function users() {
+      var _this = this;
+
+      return this.allUsers.filter(function (user) {
+        if (_this.filter === '') return user;
+        return user.name.includes(_this.filter) || user.email === _this.filter;
+      });
     }
-  })),
+  }),
   data: function data() {
     return {
       selected: "inbox",
-      activeChat: 0
+      activeChat: 0,
+      filter: ''
     };
   },
   methods: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapActions)(['getUser']))
@@ -2523,17 +2532,24 @@ __webpack_require__(/*! ./echo */ "./resources/js/echo.js");
 /*!******************************!*\
   !*** ./resources/js/echo.js ***!
   \******************************/
-/***/ (() => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _vuex_store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./vuex/store */ "./resources/js/vuex/store.js");
 
 window.Echo.join('laravel_database_chatroom').here(function (users) {
   console.log('Usuarios Online:');
   console.log(users);
+  _vuex_store__WEBPACK_IMPORTED_MODULE_0__.default.commit('ADD_ONLINE_USERS', users);
 }).joining(function (user) {
   console.log('Entrou:');
   console.log(user);
+  _vuex_store__WEBPACK_IMPORTED_MODULE_0__.default.commit('ADD_ONLINE_USER', user);
 }).leaving(function (user) {
   console.log('Saiu:');
   console.log(user);
+  _vuex_store__WEBPACK_IMPORTED_MODULE_0__.default.commit('REMOVE_ONLINE_USER', user);
 });
 
 /***/ }),
@@ -2574,7 +2590,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  sortedUsers: function sortedUsers(state) {
+    var users = state.items.data;
+    var onlineUsers = state.online;
+    users = users.sort(function (user) {
+      return onlineUsers.findIndex(function (u) {
+        return u.email === user.email;
+      }) === -1 ? 1 : -1;
+    });
+    users = users.map(function (user) {
+      var index = onlineUsers.findIndex(function (u) {
+        return u.email === user.email;
+      });
+      user.online = index != -1;
+      return user;
+    });
+    return users;
+  }
+});
 
 /***/ }),
 
@@ -2620,6 +2654,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   ADD_ALL_USERS: function ADD_ALL_USERS(state, users) {
     state.items = users;
+  },
+  ADD_ONLINE_USERS: function ADD_ONLINE_USERS(state, users) {
+    state.online = users;
+  },
+  ADD_ONLINE_USER: function ADD_ONLINE_USER(state, user) {
+    state.online.push(user);
+  },
+  REMOVE_ONLINE_USER: function REMOVE_ONLINE_USER(state, user) {
+    state.online = state.online.filter(function (u) {
+      return u.email != user.email;
+    });
   }
 });
 
@@ -2639,7 +2684,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   items: {
     data: []
-  }
+  },
+  online: []
 });
 
 /***/ }),
@@ -50298,9 +50344,26 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "relative my-5 text-gray-600" }, [
         _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.filter,
+              expression: "filter"
+            }
+          ],
           staticClass:
             "w-full bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-none focus:shadow-lg focus:bg-white hover:shadow-md",
-          attrs: { type: "search", name: "serch", placeholder: "Search" }
+          attrs: { type: "search", name: "serch", placeholder: "Search" },
+          domProps: { value: _vm.filter },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.filter = $event.target.value
+            }
+          }
         }),
         _vm._v(" "),
         _c(
@@ -50365,27 +50428,26 @@ var render = function() {
                     }
                   }),
                   _vm._v(" "),
-                  user.online
-                    ? _c(
-                        "span",
-                        {
-                          staticClass:
-                            "text-green-500 absolute -bottom-0.5 -right-0.5 rounded-full bg-white border-white border-4"
-                        },
-                        [
-                          _c("svg", { attrs: { width: "10", height: "10" } }, [
-                            _c("circle", {
-                              attrs: {
-                                cx: "5",
-                                cy: "5",
-                                r: "5",
-                                fill: "currentColor"
-                              }
-                            })
-                          ])
-                        ]
-                      )
-                    : _vm._e()
+                  _c(
+                    "span",
+                    {
+                      staticClass:
+                        "absolute -bottom-0.5 -right-0.5 rounded-full bg-white border-white border-4",
+                      class: [user.online ? "text-green-500" : "text-gray-500"]
+                    },
+                    [
+                      _c("svg", { attrs: { width: "10", height: "10" } }, [
+                        _c("circle", {
+                          attrs: {
+                            cx: "5",
+                            cy: "5",
+                            r: "5",
+                            fill: "currentColor"
+                          }
+                        })
+                      ])
+                    ]
+                  )
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "flex flex-col leading-tight mx-4" }, [
